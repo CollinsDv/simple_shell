@@ -1,0 +1,14 @@
+#include "header.h"
+
+/**
+ * main - prints process id
+ */
+int p_id(nvoid)
+{
+	size_t pid;
+
+	pid = getpid();
+	dprintf(1, "%ld\n", pid);
+
+	return (0);
+}

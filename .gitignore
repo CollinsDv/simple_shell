@@ -1,0 +1,6 @@
+# ignoring practice files
+/practice
+
+#ignore executables
+*.exe
+.out
