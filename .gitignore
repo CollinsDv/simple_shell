@@ -3,4 +3,4 @@
 
 #ignore executables
 *.exe
-.out
+*.out
