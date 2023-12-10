@@ -11,9 +11,8 @@ char **token(char *str)
 {
 	char *token = NULL, **tokens = NULL, *new_str = NULL;
 	size_t buffer = BUFFER, position, length;
-	
-	new_str = strdup(str);
 
+	new_str = strdup(str);
 	length = strlen(new_str);
 	if (length > 0 && new_str[length - 1] == '\n')
 		new_str[length - 1] = '\0';
@@ -21,10 +20,9 @@ char **token(char *str)
 	tokens = malloc(buffer * sizeof(*tokens));
 	if (tokens == NULL)
 	{
-		perror("malloc error in token function");
+		perror("hsh");
 		exit(EXIT_FAILURE);
 	}
-
 	token = strtok(new_str, " ");
 	position = 0;
 	while (token != NULL)
@@ -39,10 +37,13 @@ char **token(char *str)
 				exit(EXIT_FAILURE);
 			}
 		}
+		printf("size: %ld\n", strlen(token));
+		printf("token: %s\n", token);
 		if (strlen(token) > 0) /* skip empty token */
-			tokens[position] = token;
+			tokens[position] = strdup(token);
+		printf("dup: %s\n", tokens[position]);
 		position++;
-		strtok(NULL, " ");
+		token = strtok(NULL, " ");
 	}
 	tokens[position] = NULL;  /* Null-terminate the array */
 	free(new_str);

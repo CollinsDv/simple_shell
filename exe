@@ -20,8 +20,8 @@ void execute(char *token[], char **env)
 	printf("%s\n", environment);
 
 	environ_path = command_path(token, environment);
-
-	printf("%s\n", environ_path[0]);
+	if (environ_path == NULL)
+		return;
 
 	child = fork();
 
@@ -32,7 +32,7 @@ void execute(char *token[], char **env)
 	}
 	if (child == 0)
 	{
-		exec_val = execve(environment, token, env);
+		exec_val = execve(environ_path[0], token, env);
 		if (exec_val < 0)
 		{
 			perror("execve error in execute()");
@@ -42,7 +42,8 @@ void execute(char *token[], char **env)
 	else
 	{
 		wait(NULL);
-		free(environment);
+		free_path(environ_path);
+		printf("i am free\n");
 	}
 }
 
@@ -80,39 +81,67 @@ char *_getenv(char *environment, char **env)
  */
 char **command_path(char **token, char *environ_path)
 {
+	struct stat st;
 	char *path = NULL, **new_path = NULL, *environ_copy = NULL;
+	size_t buffer = 2; /* Initial buffer size, including the null terminator */
 
-	new_path = malloc(sizeof(*new_path) * 2);
+
+	new_path = malloc(sizeof(*new_path) * buffer);
 	if (new_path == NULL)
 	{
 		perror("malloc error in command_path");
 		exit(EXIT_FAILURE);
 	}
+
 	environ_copy = strdup(environ_path);
 	path = strtok(environ_copy, ":");
 
+	size_t position = 0;
 	while (path != NULL)
 	{
-		new_path[0] = malloc(strlen(path) + 1 + strlen(token[0]) + 1); /* 1 for slash character */
-		strcpy(new_path[0], path);
-		strcat(new_path[0], "/");
-		strcat(new_path[0], token[0]);
-		new_path[1] = NULL;
-		printf("%s\n", new_path[0]);
-
-		if (_stat(new_path) == 0)
+		if (position >= buffer - 1) /* Check if we need to resize the array */
 		{
+			buffer *= 2; /* Double the buffer size */
+			new_path = realloc(new_path, sizeof(*new_path) * buffer);
+			if (new_path == NULL)
+			{
+				perror("realloc error in command_path()");
+				exit(EXIT_FAILURE);
+			}
+		}
+	
+		new_path[position] = malloc(strlen(path) + 1 + strlen(token[0]) + 1);
+		if (new_path[position] == NULL)
+		{
+			perror("malloc error in command_path");
+			exit(EXIT_FAILURE);
+		}
+
+		strcpy(new_path[position], path);
+		strcat(new_path[position], "/");
+		strcat(new_path[position], token[0]);
+		strcat(new_path[position], "\0");
+
+		printf("%s\n", new_path[position]);
+
+		if (stat(new_path[position], &st) == 0)
+		{
+			printf("PATH found\n");
 			free(environ_copy);
+			new_path[position + 1] = NULL; // Null-terminate the array
+			printf("before return: %s\n", new_path[position]);
 			return (new_path);
 		}
-		printf("%s not found\n", new_path[0]);
+		printf("%s not found\n", new_path[position]);
 
-		free(new_path[0]);
-		strtok(NULL, ":");
+		free(new_path[position]);
+		//position++;
+		path = strtok(NULL, ":");
 	}
+
 	free(environ_copy);
-	dprintf(2, "%s: command doesn't exist", token[0]);
-	exit(EXIT_FAILURE);
+	dprintf(2, "%s: command doesn't exist\n", token[0]);
+	return (NULL);
 }
 
 /**
@@ -122,11 +151,10 @@ char **command_path(char **token, char *environ_path)
  */
 void free_path(char **dup_path)
 {
-	size_t i;
+	//size_t i;
 
-	for (i = 0; dup_path[i] != NULL; i++)
-	{
-		free(dup_path[i]);
-	}
-	//free(path);
+	//for (i = 0; dup_path[i] != NULL; i++)
+	//	free(dup_path[i]);
+	free(dup_path);
+	dup_path = NULL;
 }

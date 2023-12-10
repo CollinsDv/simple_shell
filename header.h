@@ -26,5 +26,6 @@ void _free(char *argv, char **tokens);
 char *_getenv(char *enviroment, char **env);
 void free_path(char **dup_path);
 char **command_path(char **token, char *environ_path);
+char **check_path(char **tokens, char **env);
 
 #endif

@@ -9,8 +9,14 @@ void execute(char *token[], char **env)
 {
 	pid_t child;
 	ssize_t exec_val;
-	char *environment = NULL, **environ_path = NULL;
-
+	char *environment , **environ_path;
+	
+	environment = NULL;
+	environ_path = NULL;
+	if (check_path(token, env) == NULL)
+	{
+		return;
+	}
 	environment = _getenv("PATH", env);
 	if (environment == NULL)
 	{
@@ -83,8 +89,7 @@ char **command_path(char **token, char *environ_path)
 {
 	struct stat st;
 	char *path = NULL, **new_path = NULL, *environ_copy = NULL;
-	size_t buffer = 2; /* Initial buffer size, including the null terminator */
-
+	size_t buffer = 2, position; /* Initial buffer size, including the null terminator */
 
 	new_path = malloc(sizeof(*new_path) * buffer);
 	if (new_path == NULL)
@@ -92,31 +97,19 @@ char **command_path(char **token, char *environ_path)
 		perror("malloc error in command_path");
 		exit(EXIT_FAILURE);
 	}
-
 	environ_copy = strdup(environ_path);
 	path = strtok(environ_copy, ":");
 
-	size_t position = 0;
+	position = 0;
 	while (path != NULL)
 	{
-		if (position >= buffer - 1) /* Check if we need to resize the array */
-		{
-			buffer *= 2; /* Double the buffer size */
-			new_path = realloc(new_path, sizeof(*new_path) * buffer);
-			if (new_path == NULL)
-			{
-				perror("realloc error in command_path()");
-				exit(EXIT_FAILURE);
-			}
-		}
-
+		 printf("%s\n", path);
 		new_path[position] = malloc(strlen(path) + 1 + strlen(token[0]) + 1);
 		if (new_path[position] == NULL)
 		{
 			perror("malloc error in command_path");
 			exit(EXIT_FAILURE);
 		}
-
 		strcpy(new_path[position], path);
 		strcat(new_path[position], "/");
 		strcat(new_path[position], token[0]);
@@ -135,7 +128,6 @@ char **command_path(char **token, char *environ_path)
 		printf("%s not found\n", new_path[position]);
 
 		free(new_path[position]);
-		//position++;
 		path = strtok(NULL, ":");
 	}
 
