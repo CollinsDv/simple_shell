@@ -9,8 +9,8 @@
  */
 char **token(char *str)
 {
-	char *token = NULL, **tokens = NULL, *new_str = NULL;
 	size_t buffer = BUFFER, position, length;
+	char *token = NULL, **tokens = NULL, *new_str = NULL;
 
 	new_str = strdup(str);
 	length = strlen(new_str);

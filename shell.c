@@ -7,11 +7,11 @@
  */
 int main(int ac, char **av, char **env)
 {
-	(void)ac;
-	(void)av;
 	char *argv = NULL, **tokens = NULL;
 	ssize_t characters = 0;
-	size_t size = 0;
+	size_t size = 0, count = 1;
+	(void)ac;
+	(void)av;
 
 	while (1) /* invokes an endless loop for user input */
 	{
@@ -21,27 +21,25 @@ int main(int ac, char **av, char **env)
 
 		if (characters < 0)
 		{
-			perror("getline error");
 			free(argv);
+			argv = NULL;
+			write(1, "\n", 1);
 			exit(EXIT_FAILURE);
 		}
-		if (characters == -1) 
-			break;
 		if (characters == 1 && *argv == '\n')
 		{
 			free(argv);
 			argv = NULL;
+			count++;
 			continue;
 		}
 
 		tokens = token(argv);
-		//printf("in shell(): %s\n", argv);
-		execute(tokens, env);
+
+		execute(tokens, env, &count);
 
 		_free(argv, tokens);
 	}
-	free(argv);
-	exit(EXIT_SUCCESS);
 }
 
 /**
@@ -53,13 +51,13 @@ void _free(char *argv, char **tokens)
 {
 	size_t i;
 
-	i = 1;
+	i = 0;
 	while (tokens[i])
 	{
 		free(tokens[i]);
 		i++;
 	}
-	//free(tokens);
+	free(tokens);
 	free(argv);
 
 	argv = NULL;

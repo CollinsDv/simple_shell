@@ -29,6 +29,7 @@ int main(void)
 		printf("the chars are %s", ptr);
 
 		dup = strdup(ptr);
+		dup[strlen(dup) - 1] = '\0';
 
 		malok = malloc(sizeof(*malok) * 10);
 
@@ -49,18 +50,19 @@ int main(void)
 			i++;
 		}
 		i = 0;
-		while (malok[i])
-		{
-			free(malok[i]);
-			i++;
-		}
+		//while (malok[i])
+		//{
+		//	free(malok[i]);
+		//	i++;
+		//}
 		free(malok);
-		free(ptr);
 		free(dup);
+		free(ptr);
 
 		dup = NULL;
 		ptr = NULL;
 		malok = NULL;
 	}
+	free(ptr);
 	return (0);
 }

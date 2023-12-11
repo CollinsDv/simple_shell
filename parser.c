@@ -5,7 +5,7 @@
  *
  * @token: pointer to the tokens
  */
-void execute(char *token[], char **env)
+void execute(char *token[], char **env, size_t *count)
 {
 	pid_t child;
 	ssize_t exec_val;
@@ -13,19 +13,19 @@ void execute(char *token[], char **env)
 	
 	environment = NULL;
 	environ_path = NULL;
-	if (check_path(token, env) == NULL)
+	if (check_path(token, env, count) == NULL)
 	{
 		return;
 	}
-	environment = _getenv("PATH", env);
+	environment = _getenv("PATH", env, count);
 	if (environment == NULL)
 	{
 		perror("PATH not found");
-		exit(EXIT_FAILURE);
+		return;
 	}
 	printf("%s\n", environment);
 
-	environ_path = command_path(token, environment);
+	environ_path = command_path(token, environment, count);
 	if (environ_path == NULL)
 		return;
 
@@ -42,13 +42,13 @@ void execute(char *token[], char **env)
 		if (exec_val < 0)
 		{
 			perror("execve error in execute()");
-			exit(EXIT_FAILURE);
 		}
 	}
 	else
 	{
 		wait(NULL);
 		free_path(environ_path);
+		*count += 1;
 		printf("i am free\n");
 	}
 }
@@ -61,7 +61,7 @@ void execute(char *token[], char **env)
  *
  * Return: pointer to PATH environment from env
  */
-char *_getenv(char *environment, char **env)
+char *_getenv(char *environment, char **env, size_t *count)
 {
 	size_t i;
 
@@ -73,8 +73,8 @@ char *_getenv(char *environment, char **env)
 		else
 			i++;
 	}
-
-	return (env[i]);
+	*count += 1;
+	return (NULL);
 }
 
 /**
@@ -85,7 +85,7 @@ char *_getenv(char *environment, char **env)
  *
  * Return: new path with command appended to system directories
  */
-char **command_path(char **token, char *environ_path)
+char **command_path(char **token, char *environ_path, size_t *count)
 {
 	struct stat st;
 	char *path = NULL, **new_path = NULL, *environ_copy = NULL;
@@ -95,7 +95,8 @@ char **command_path(char **token, char *environ_path)
 	if (new_path == NULL)
 	{
 		perror("malloc error in command_path");
-		exit(EXIT_FAILURE);
+		*count += 1;
+		return (NULL);
 	}
 	environ_copy = strdup(environ_path);
 	path = strtok(environ_copy, ":");
@@ -108,7 +109,8 @@ char **command_path(char **token, char *environ_path)
 		if (new_path[position] == NULL)
 		{
 			perror("malloc error in command_path");
-			exit(EXIT_FAILURE);
+			*count += 1;
+			return (NULL);
 		}
 		strcpy(new_path[position], path);
 		strcat(new_path[position], "/");
@@ -121,7 +123,7 @@ char **command_path(char **token, char *environ_path)
 		{
 			printf("PATH found\n");
 			free(environ_copy);
-			new_path[position + 1] = NULL; // Null-terminate the array
+			new_path[position + 1] = NULL; /* Null-terminate the array */
 			printf("before return: %s\n", new_path[position]);
 			return (new_path);
 		}
@@ -132,7 +134,10 @@ char **command_path(char **token, char *environ_path)
 	}
 
 	free(environ_copy);
-	dprintf(2, "%s: command doesn't exist\n", token[0]);
+	new_path[position + 1] = NULL;
+	free_path(new_path);
+	dprintf(2, "hsh: [%ld]: %s: doesn't exist\n", *count, token[0]);
+	*count += 1;
 	return (NULL);
 }
 
@@ -143,10 +148,10 @@ char **command_path(char **token, char *environ_path)
  */
 void free_path(char **dup_path)
 {
-	//size_t i;
+	size_t i;
 
-	//for (i = 0; dup_path[i] != NULL; i++)
-	//	free(dup_path[i]);
+	for (i = 0; dup_path[i] != NULL; i++)
+		free(dup_path[i]);
 	free(dup_path);
 	dup_path = NULL;
 }

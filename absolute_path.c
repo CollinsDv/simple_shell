@@ -5,7 +5,7 @@
  * @tokens: tokens containing path
  * @env: environment
  */
-char **check_path(char **tokens, char **env)
+char **check_path(char **tokens, char **env, size_t *count)
 {
 	struct stat st;
 	pid_t child;
@@ -15,7 +15,8 @@ char **check_path(char **tokens, char **env)
 
 	if (stat(tokens[0], &st) < 0)
 	{
-		dprintf(2, "hsh: %s: not found\n", tokens[0]);
+		dprintf(2, "hsh: [%ld]: %s: not found\n", *count, tokens[0]);
+		*count += 1;
 		return (NULL);
 	}
 
@@ -34,5 +35,6 @@ char **check_path(char **tokens, char **env)
 		}
 	}
 	wait(NULL);
+	*count += 1;
 	return (NULL);
 }
