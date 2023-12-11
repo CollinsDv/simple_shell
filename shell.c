@@ -58,7 +58,7 @@ void _free(char *argv, char **tokens)
 {
 	size_t i;
 
-	i = 0;
+	i = 1;
 	while (tokens[i])
 	{
 		free(tokens[i]);
