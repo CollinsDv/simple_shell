@@ -26,7 +26,7 @@ int main(int ac, char **av, char **env)
 		{
 			free(argv);
 			argv = NULL;
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 		}
 		if (characters == 1 && *argv == '\n')
 		{
@@ -57,15 +57,16 @@ int main(int ac, char **av, char **env)
 void _free(char *argv, char **tokens)
 {
 	size_t i;
+	(void)argv;
 
-	i = 1;
+	i = 0;
 	while (tokens[i])
 	{
 		free(tokens[i]);
 		i++;
 	}
 	free(tokens);
-	free(argv);
+	/* free(argv); */
 
 	argv = NULL;
 	tokens = NULL;

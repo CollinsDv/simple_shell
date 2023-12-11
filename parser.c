@@ -102,7 +102,7 @@ char **command_path(char **token, char *environ_path, size_t *count)
 	position = 0;
 	while (path != NULL)
 	{
-		printf("%s\n", path);
+		/*printf("%s\n", path);*/
 		new_path[position] = malloc(strlen(path) + 1 + strlen(token[0]) + 1);
 		if (new_path[position] == NULL)
 		{
@@ -115,17 +115,17 @@ char **command_path(char **token, char *environ_path, size_t *count)
 		strcat(new_path[position], token[0]);
 		strcat(new_path[position], "\0");
 
-		printf("%s\n", new_path[position]);
+		/*printf("%s\n", new_path[position]);*/
 
 		if (stat(new_path[position], &st) == 0)
 		{
-			printf("PATH found\n");
+			/*printf("PATH found\n");*/
 			free(environ_copy);
 			new_path[position + 1] = NULL; /* Null-terminate the array */
-			printf("before return: %s\n", new_path[position]);
+			/*printf("before return: %s\n", new_path[position]);*/
 			return (new_path);
 		}
-		printf("%s not found\n", new_path[position]);
+		/*printf("%s not found\n", new_path[position]);*/
 
 		free(new_path[position]);
 		path = strtok(NULL, ":");

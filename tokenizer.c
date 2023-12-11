@@ -37,11 +37,11 @@ char **token(char *str)
 				exit(EXIT_FAILURE);
 			}
 		}
-		printf("size: %ld\n", strlen(token));
-		printf("token: %s\n", token);
+		/* printf("size: %ld\n", strlen(token)); */
+		/* printf("token: %s\n", token); */
 		if (strlen(token) > 0) /* skip empty token */
 			tokens[position] = strdup(token);
-		printf("dup: %s\n", tokens[position]);
+		/* printf("dup: %s\n", tokens[position]);*/
 		position++;
 		token = strtok(NULL, " ");
 	}
