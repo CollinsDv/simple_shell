@@ -22,12 +22,10 @@ int main(int ac, char **av, char **env)
 		prompt(); /* prompt user input */
 
 		characters = getline(&argv, &size, stdin); /* getting user input */
-
 		if (characters < 0)
 		{
 			free(argv);
 			argv = NULL;
-			write(1, "\n", 1);
 			exit(EXIT_FAILURE);
 		}
 		if (characters == 1 && *argv == '\n')
@@ -37,8 +35,13 @@ int main(int ac, char **av, char **env)
 			count++;
 			continue;
 		}
-
 		tokens = token(argv);
+		if (strcmp(tokens[0], "exit") == 0 || strcmp(tokens[0], "quit") == 0)
+		{
+			free(argv);
+			_free(argv, tokens);
+			exit(EXIT_SUCCESS);
+		}
 
 		execute(tokens, env, &count);
 
