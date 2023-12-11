@@ -3,6 +3,10 @@
 /**
  * main - this is the entry point to my shell
  *
+ * @ac: unused arguement count
+ * @av:  unused arguement vector
+ * @env: environment variable
+ *
  * Return: EXIT_SUCCESS or FAILURE
  */
 int main(int ac, char **av, char **env)

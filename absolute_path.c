@@ -1,9 +1,13 @@
 #include "header.h"
 
 /**
- * path_type - determines if a path is absolute or relative
+ * check_path - determines if a path is absolute or relative
+ *
  * @tokens: tokens containing path
  * @env: environment
+ * @count: ..
+ *
+ * Return: pointer to command if it's not an absolute path or NULL
  */
 char **check_path(char **tokens, char **env, size_t *count)
 {

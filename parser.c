@@ -4,15 +4,15 @@
  * execute - handles process executions of commands-line arguements
  *
  * @token: pointer to the tokens
+ * @env: pointer to environment
+ * @count: pointer to count in main
  */
 void execute(char *token[], char **env, size_t *count)
 {
 	pid_t child;
 	ssize_t exec_val;
-	char *environment , **environ_path;
-	
-	environment = NULL;
-	environ_path = NULL;
+	char *environment = NULL, **environ_path = NULL;
+
 	if (check_path(token, env, count) == NULL)
 	{
 		return;
@@ -23,8 +23,6 @@ void execute(char *token[], char **env, size_t *count)
 		perror("PATH not found");
 		return;
 	}
-	printf("%s\n", environment);
-
 	environ_path = command_path(token, environment, count);
 	if (environ_path == NULL)
 		return;
@@ -49,15 +47,15 @@ void execute(char *token[], char **env, size_t *count)
 		wait(NULL);
 		free_path(environ_path);
 		*count += 1;
-		printf("i am free\n");
 	}
 }
 
 /**
  * _getenv - gets the environment PATH
- * 
+ *
  * @environment: string containing PATH string
  * @env: environment variables
+ * @count: pointer to count in main
  *
  * Return: pointer to PATH environment from env
  */
@@ -70,8 +68,7 @@ char *_getenv(char *environment, char **env, size_t *count)
 	{
 		if (strncmp(env[i], environment, strlen(environment)) == 0)
 			return (env[i]);
-		else
-			i++;
+		i++;
 	}
 	*count += 1;
 	return (NULL);
@@ -82,14 +79,15 @@ char *_getenv(char *environment, char **env, size_t *count)
  *
  * @token: command table with the command in token[1]
  * @environ_path: system path
+ * @count: pointer to count in main
  *
  * Return: new path with command appended to system directories
  */
 char **command_path(char **token, char *environ_path, size_t *count)
 {
 	struct stat st;
+	size_t buffer = 2, position; /* including the null terminator */
 	char *path = NULL, **new_path = NULL, *environ_copy = NULL;
-	size_t buffer = 2, position; /* Initial buffer size, including the null terminator */
 
 	new_path = malloc(sizeof(*new_path) * buffer);
 	if (new_path == NULL)
@@ -104,7 +102,7 @@ char **command_path(char **token, char *environ_path, size_t *count)
 	position = 0;
 	while (path != NULL)
 	{
-		 printf("%s\n", path);
+		printf("%s\n", path);
 		new_path[position] = malloc(strlen(path) + 1 + strlen(token[0]) + 1);
 		if (new_path[position] == NULL)
 		{
@@ -142,9 +140,9 @@ char **command_path(char **token, char *environ_path, size_t *count)
 }
 
 /**
- * free_path - frees memory location for new command path
+ * free_path - frees memory location for dynamic memory
  *
- * @path: command path
+ * @dup_path: path to free
  */
 void free_path(char **dup_path)
 {
