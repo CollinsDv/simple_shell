@@ -5,6 +5,6 @@
 *.exe
 *.out
 
-TEST_SUITES
+./TEST_SUITES
 allowed_functions
-runchecker.bash
+./runchecker.bash
