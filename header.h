@@ -28,5 +28,6 @@ char *_getenv(char *enviroment, char **env, size_t *count);
 void free_path(char **dup_path);
 char **command_path(char **token, char *environ_path, size_t *count);
 char **check_path(char **tokens, char **env, size_t *count);
+void free_new_path(char **new_path);
 
 #endif

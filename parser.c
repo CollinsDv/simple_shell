@@ -133,7 +133,7 @@ char **command_path(char **token, char *environ_path, size_t *count)
 
 	free(environ_copy);
 	new_path[position + 1] = NULL;
-	free_path(new_path);
+	free_new_path(new_path);
 	dprintf(2, "hsh: [%ld]: %s: doesn't exist\n", *count, token[0]);
 	*count += 1;
 	return (NULL);
@@ -152,4 +152,20 @@ void free_path(char **dup_path)
 		free(dup_path[i]);
 	free(dup_path);
 	dup_path = NULL;
+}
+
+/**
+ * free_new_path - handles malloc reallocation in command_path
+ *                 if command isn't found
+ *
+ * @new_path: path to malloc
+ */
+void free_new_path(char **new_path)
+{
+	size_t i;
+
+	for (i = 1; new_path[i] != NULL; i++)
+		free(new_path[i]);
+	free(new_path);
+	new_path = NULL;
 }

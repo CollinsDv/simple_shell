@@ -36,6 +36,11 @@ int main(int ac, char **av, char **env)
 			continue;
 		}
 		tokens = token(argv);
+		if (tokens[0] == NULL)
+		{
+			_free(argv, tokens);
+			continue;
+		}
 		if (strcmp(tokens[0], "exit") == 0 || strcmp(tokens[0], "quit") == 0)
 		{
 			free(argv);
