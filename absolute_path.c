@@ -14,7 +14,7 @@ char **check_path(char **tokens, char **env, size_t *count)
 	struct stat st;
 	pid_t child;
 
-	if (tokens[0][0] != '/')
+	if (tokens[0][0] != '.' && tokens[0][0] != '/')
 		return (tokens);
 
 	if (stat(tokens[0], &st) < 0)

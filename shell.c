@@ -47,9 +47,7 @@ int main(int ac, char **av, char **env)
 			_free(argv, tokens);
 			exit(EXIT_SUCCESS);
 		}
-
 		execute(tokens, env, &count);
-
 		_free(argv, tokens);
 	}
 }
