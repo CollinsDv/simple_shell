@@ -6,10 +6,13 @@
  * @tokens: tokens containing path
  * @env: environment
  * @count: ..
+ * @av: program name
+ * @exit_status: UNIX exit status if command not found
  *
  * Return: pointer to command if it's not an absolute path or NULL
  */
-char **check_path(char **tokens, char **env, size_t *count)
+char **check_path(char **tokens, char **env
+		, size_t *count, char *av, int *exit_status)
 {
 	struct stat st;
 	pid_t child;
@@ -19,8 +22,9 @@ char **check_path(char **tokens, char **env, size_t *count)
 
 	if (stat(tokens[0], &st) < 0)
 	{
-		dprintf(2, "hsh: [%ld]: %s: not found\n", *count, tokens[0]);
+		dprintf(2, "%s: %ld: %s: not found\n", av, *count, tokens[0]);
 		*count += 1;
+		*exit_status = 127;
 		return (NULL);
 	}
 

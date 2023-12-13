@@ -6,14 +6,16 @@
  * @token: pointer to the tokens
  * @env: pointer to environment
  * @count: pointer to count in main
+ * @av: program name
+ * @exit_status: pointer to exit status in main
  */
-void execute(char *token[], char **env, size_t *count)
+void execute(char *token[], char **env, size_t *count, char *av
+		, int *exit_status)
 {
 	pid_t child;
-	ssize_t exec_val;
 	char *environment = NULL, **environ_path = NULL;
 
-	if (check_path(token, env, count) == NULL)
+	if (check_path(token, env, count, av, exit_status) == NULL)
 	{
 		return;
 	}
@@ -21,14 +23,15 @@ void execute(char *token[], char **env, size_t *count)
 	if (environment == NULL)
 	{
 		perror("PATH not found");
+		exit(EXIT_FAILURE);
+	}
+	environ_path = command_path(token, environment, count, av);
+	if (environ_path == NULL)
+	{
+		*exit_status = 127;
 		return;
 	}
-	environ_path = command_path(token, environment, count);
-	if (environ_path == NULL)
-		return;
-
 	child = fork();
-
 	if (child < 0)
 	{
 		perror("fork error in execute()");
@@ -36,10 +39,10 @@ void execute(char *token[], char **env, size_t *count)
 	}
 	if (child == 0)
 	{
-		exec_val = execve(environ_path[0], token, env);
-		if (exec_val < 0)
+		if (execve(environ_path[0], token, env) < 0)
 		{
 			perror("execve error in execute()");
+			exit(EXIT_FAILURE);
 		}
 	}
 	else
@@ -80,10 +83,11 @@ char *_getenv(char *environment, char **env, size_t *count)
  * @token: command table with the command in token[1]
  * @environ_path: system path
  * @count: pointer to count in main
+ * @av: name of executable
  *
  * Return: new path with command appended to system directories
  */
-char **command_path(char **token, char *environ_path, size_t *count)
+char **command_path(char **token, char *environ_path, size_t *count, char *av)
 {
 	struct stat st;
 	size_t buffer = 2, position; /* (2) - including the null terminator */
@@ -122,7 +126,7 @@ char **command_path(char **token, char *environ_path, size_t *count)
 	free(environ_copy);
 	new_path[position + 1] = NULL;
 	free_new_path(new_path);
-	dprintf(2, "hsh: [%ld]: %s: doesn't exist\n", *count, token[0]);
+	dprintf(2, "%s: %ld: %s: not found\n", av, *count, token[0]);
 	*count += 1;
 	return (NULL);
 }

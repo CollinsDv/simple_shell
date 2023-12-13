@@ -14,8 +14,8 @@ int main(int ac, char **av, char **env)
 	char *argv = NULL, **tokens = NULL;
 	ssize_t characters = 0;
 	size_t size = 0, count = 1;
+	int exit_status = 0;
 	(void)ac;
-	(void)av;
 
 	while (1) /* invokes an endless loop for user input */
 	{
@@ -26,7 +26,7 @@ int main(int ac, char **av, char **env)
 		{
 			free(argv);
 			argv = NULL;
-			exit(EXIT_SUCCESS);
+			exit(exit_status);
 		}
 		if (characters == 1 && *argv == '\n')
 		{
@@ -45,9 +45,9 @@ int main(int ac, char **av, char **env)
 		{
 			free(argv);
 			_free(argv, tokens);
-			exit(EXIT_SUCCESS);
+			exit(exit_status);
 		}
-		execute(tokens, env, &count);
+		execute(tokens, env, &count, av[0], &exit_status);
 		_free(argv, tokens);
 	}
 }
